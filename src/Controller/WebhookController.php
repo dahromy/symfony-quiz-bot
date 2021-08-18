@@ -15,10 +15,25 @@ namespace App\Controller;
 
 use App\Conversations\QuizConversation;
 use BotMan\BotMan\BotMan;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 class WebhookController
 {
+    /**
+     * @var EntityManagerInterface
+     */
+    private $manager;
+
+    /**
+     * WebhookController constructor.
+     * @param EntityManagerInterface $manager
+     */
+    public function __construct(EntityManagerInterface $manager)
+    {
+        $this->manager = $manager;
+    }
+
     public function __invoke(BotMan $botman): Response
     {
         $botman->hears('Hi', function (BotMan $bot) {
@@ -26,7 +41,7 @@ class WebhookController
         });
 
         $botman->hears('start', function (BotMan $bot) {
-            $bot->startConversation(new QuizConversation());
+            $bot->startConversation(new QuizConversation($this->manager));
         });
 
         $botman->listen();
