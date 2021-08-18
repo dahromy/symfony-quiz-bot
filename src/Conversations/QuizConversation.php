@@ -6,6 +6,7 @@ namespace App\Conversations;
 
 use App\Entity\Answer;
 use App\Entity\Question;
+use App\Repository\AnswerRepository;
 use BotMan\BotMan\Messages\Conversations\Conversation;
 use BotMan\BotMan\Messages\Incoming\Answer as BotManAnswer;
 use BotMan\BotMan\Messages\Outgoing\Actions\Button;
@@ -32,14 +33,20 @@ class QuizConversation extends Conversation
      * @var EntityManagerInterface
      */
     private $manager;
+    /**
+     * @var AnswerRepository
+     */
+    private $answerRepository;
 
     /**
      * QuizConversation constructor.
      * @param EntityManagerInterface $manager
+     * @param AnswerRepository $answerRepository
      */
-    public function __construct(EntityManagerInterface $manager)
+    public function __construct(EntityManagerInterface $manager, AnswerRepository $answerRepository)
     {
         $this->manager = $manager;
+        $this->answerRepository = $answerRepository;
     }
 
     /**
@@ -72,7 +79,7 @@ class QuizConversation extends Conversation
     {
         $this->ask($this->createQuestionTemplate($question), function (BotManAnswer $answer) use ($question) {
             /** @var Answer $quizAnswer */
-            $quizAnswer = $this->manager->getRepository(Answer::class)->findOneBy(['id' => 1]);
+            $quizAnswer = $this->answerRepository->findOneBy(['id' => $answer->getValue()]);
 
             if (! $quizAnswer) {
                 $this->say('Sorry, I did not get that. Please use the buttons.');
