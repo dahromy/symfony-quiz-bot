@@ -72,7 +72,7 @@ class QuizConversation extends Conversation
     {
         $this->ask($this->createQuestionTemplate($question), function (BotManAnswer $answer) use ($question) {
             /** @var Answer $quizAnswer */
-            $quizAnswer = $this->manager->getRepository(Answer::class)->findOneBy(['id' => $answer->getValue()]);
+            $quizAnswer = $this->manager->getRepository(Answer::class)->findOneBy(['id' => 1]);
 
             if (! $quizAnswer) {
                 $this->say('Sorry, I did not get that. Please use the buttons.');
