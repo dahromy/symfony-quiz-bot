@@ -24,7 +24,8 @@
         "symfony/twig-bundle": "^4.4",
         "symfony/yaml": "4.4.*",
         "twig/extra-bundle": "^2.12|^3.0",
-        "twig/twig": "^2.12|^3.0"
+        "twig/twig": "^2.12|^3.0",
+        "symfony/maker-bundle": "^1.33"
     },
     "config": {
         "preferred-install": {
@@ -72,7 +73,6 @@
         }
     },
     "require-dev": {
-        "symfony/maker-bundle": "^1.33",
         "symfony/stopwatch": "^4.4",
         "symfony/web-profiler-bundle": "^4.4"
     }
