@@ -69,18 +69,20 @@ class QuizConversation extends Conversation
     public function checkForNextQuestion()
     {
         if (count($this->quizQuestions) > 0) {
-            return $this->askQuestion(current($this->quizQuestions));
+            return $this->askQuestion(current($this->quizQuestions), $this->manager);
         }
 
         $this->showResult();
     }
 
-    public function askQuestion(Question $question)
+    public function askQuestion(Question $question, $manager)
     {
-        $this->ask($this->createQuestionTemplate($question), function (BotManAnswer $answer) use ($question) {
+        $this->ask($this->createQuestionTemplate($question), function (BotManAnswer $answer) use ($manager, $question) {
 
             /** @var Answer $quizAnswer */
-            $quizAnswer = $question->getAnswers()[(int)$answer->getValue() - 1];
+            $quizAnswer =$correctAnswer = $manager->getRepository(Answer::class)->findOneBy([
+                'id' => $answer->getValue()
+            ]);
 
             if (! $quizAnswer) {
                 $this->say('Sorry, I did not get that. Please use the buttons.');
@@ -94,13 +96,14 @@ class QuizConversation extends Conversation
                 $this->userCorrectAnswers++;
                 $answerResult = '✅';
             } else {
-                $correctAnswer = $this->manager->getRepository(Answer::class)->findOneBy([
+                $correctAnswer = $manager->getRepository(Answer::class)->findOneBy([
                     'question' => $question,
                     'correctOne' => true
                 ])->getText();
 
                 $answerResult = "❌ (Correct: {$correctAnswer})";
             }
+
             $this->currentQuestion++;
 
             $this->say("Your answer: {$quizAnswer->getText()} {$answerResult}");
