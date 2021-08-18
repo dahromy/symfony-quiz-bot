@@ -46,7 +46,7 @@ class QuizConversation extends Conversation
      */
     public function run()
     {
-        $this->quizQuestions = $this->manager->getRepository(Question::class)->findBy([], ['id' => 'DESC']);
+        $this->quizQuestions = $this->manager->getRepository(Question::class)->findAll();
         $this->questionCount = count($this->quizQuestions);
 
         $this->showInfo();
