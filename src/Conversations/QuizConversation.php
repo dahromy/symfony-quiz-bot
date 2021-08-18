@@ -60,13 +60,13 @@ class QuizConversation extends Conversation
         $this->showInfo();
     }
 
-    private function showInfo()
+    public function showInfo()
     {
         $this->say('You will be shown '.$this->questionCount.' questions about Laravel. Every correct answer will reward you with a certain amount of points. Please keep it fair, and don\'t use any help. All the best! 🍀');
         $this->checkForNextQuestion();
     }
 
-    private function checkForNextQuestion()
+    public function checkForNextQuestion()
     {
         if (count($this->quizQuestions) > 0) {
             return $this->askQuestion(current($this->quizQuestions));
@@ -75,7 +75,7 @@ class QuizConversation extends Conversation
         $this->showResult();
     }
 
-    private function askQuestion(Question $question)
+    public function askQuestion(Question $question)
     {
         $this->ask($this->createQuestionTemplate($question), function (BotManAnswer $answer) use ($question) {
             /** @var Answer $quizAnswer */
@@ -107,13 +107,13 @@ class QuizConversation extends Conversation
         });
     }
 
-    private function showResult()
+    public function showResult()
     {
         $this->say('Finished 🏁');
         $this->say("You made it through all the questions. You reached {$this->userPoints} points! Correct answers: {$this->userCorrectAnswers} / {$this->questionCount}");
     }
 
-    private function createQuestionTemplate(Question $question)
+    public function createQuestionTemplate(Question $question)
     {
         $questionText = '➡️ Question: '.$this->currentQuestion.' / '.$this->questionCount.' : '.$question->getText();
         $questionTemplate = BotManQuestion::create($questionText);
@@ -126,7 +126,7 @@ class QuizConversation extends Conversation
         return $questionTemplate;
     }
 
-    private function setQuizData(Question $question)
+    public function setQuizData(Question $question)
     {
         $data = [];
 
