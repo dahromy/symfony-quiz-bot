@@ -84,7 +84,7 @@ class QuizConversation extends Conversation
                 'id' => $answer->getValue()
             ]);
 
-            if (! $quizAnswer) {
+            if (!$quizAnswer) {
                 $this->say('Sorry, I did not get that. Please use the buttons.');
                 return $this->checkForNextQuestion();
             }
