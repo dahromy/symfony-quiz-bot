@@ -4,6 +4,7 @@
 namespace App\Conversations;
 
 
+use App\Entity\Answer;
 use App\Entity\Question;
 use BotMan\BotMan\Messages\Conversations\Conversation;
 use BotMan\BotMan\Messages\Incoming\Answer as BotManAnswer;
@@ -60,8 +61,8 @@ class QuizConversation extends Conversation
 
     private function checkForNextQuestion()
     {
-        if (count($this->quizQuestions)) {
-            return $this->askQuestion($this->quizQuestions[0]);
+        if (count($this->quizQuestions) > 0) {
+            return $this->askQuestion(current($this->quizQuestions));
         }
 
         $this->showResult();
@@ -69,15 +70,32 @@ class QuizConversation extends Conversation
 
     private function askQuestion(Question $question)
     {
-        $questionTemplate = BotManQuestion::create($question->getText());
+        $this->ask($this->createQuestionTemplate($question), function (BotManAnswer $answer) use ($question) {
+            /** @var Answer $quizAnswer */
+            $quizAnswer = $this->manager->getRepository(Answer::class)->findOneBy(['text' => $answer->getValue()]);
 
-        foreach ($question->getAnswers() as $answer) {
-            $questionTemplate->addButton(Button::create($answer->getText())->value($answer->getId()));
-        }
+            if (! $quizAnswer) {
+                $this->say('Sorry, I did not get that. Please use the buttons.');
+                return $this->checkForNextQuestion();
+            }
 
-        $this->ask($questionTemplate, function (BotManAnswer $answer) use ($question) {
-            $this->quizQuestions = array_shift($this->quizQuestions);
+            $this->quizQuestions = $this->setQuizData($question);
 
+            if ($quizAnswer->getCorrectOne()) {
+                $this->userPoints += $question->getPoints();
+                $this->userCorrectAnswers++;
+                $answerResult = '✅';
+            } else {
+                $correctAnswer = $this->manager->getRepository(Answer::class)->findOneBy([
+                    'question' => $question,
+                    'correctOne' => true
+                ])->getText();
+
+                $answerResult = "❌ (Correct: {$correctAnswer})";
+            }
+            $this->currentQuestion++;
+
+            $this->say("Your answer: {$quizAnswer->getText()} {$answerResult}");
             $this->checkForNextQuestion();
         });
     }
@@ -85,5 +103,32 @@ class QuizConversation extends Conversation
     private function showResult()
     {
         $this->say('Finished 🏁');
+        $this->say("You made it through all the questions. You reached {$this->userPoints} points! Correct answers: {$this->userCorrectAnswers} / {$this->questionCount}");
+    }
+
+    private function createQuestionTemplate(Question $question)
+    {
+        $questionText = '➡️ Question: '.$this->currentQuestion.' / '.$this->questionCount.' : '.$question->getText();
+        $questionTemplate = BotManQuestion::create($questionText);
+        $answers = $question->getAnswers();
+
+        foreach ($answers as $answer) {
+            $questionTemplate->addButton(Button::create($answer->getText())->value($answer->getId()));
+        }
+
+        return $questionTemplate;
+    }
+
+    private function setQuizData(Question $question)
+    {
+        $data = [];
+
+        foreach ($this->quizQuestions as $quizQuestion){
+            if ($quizQuestion->getId() !== $question->getId()){
+                $data[] = $quizQuestion;
+            }
+        }
+
+        return $data;
     }
 }
