@@ -10,7 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Entity(repositoryClass=QuestionRepository::class)
  */
-class Question
+class Question implements \Countable
 {
     /**
      * @ORM\Id
@@ -96,5 +96,10 @@ class Question
         }
 
         return $this;
+    }
+
+    public function count()
+    {
+        // TODO: Implement count() method.
     }
 }
