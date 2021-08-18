@@ -13,6 +13,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Conversations\QuizConversation;
 use BotMan\BotMan\BotMan;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -20,8 +21,12 @@ class WebhookController
 {
     public function __invoke(BotMan $botman): Response
     {
-        $botman->fallback(function (BotMan $bot): void {
-            $bot->reply($bot->getMessage()->getText());
+        $botman->hears('Hi', function (BotMan $bot) {
+            $bot->reply('Hello!');
+        });
+
+        $botman->hears('start', function (BotMan $bot) {
+            $bot->startConversation(new QuizConversation());
         });
 
         $botman->listen();
