@@ -78,7 +78,7 @@ class QuizConversation extends Conversation
         $this->ask($this->createQuestionTemplate($question), function (BotManAnswer $answer) use ($question) {
 
             /** @var Answer $quizAnswer */
-            $quizAnswer =$correctAnswer = $this->answerRepository->findOneBy([
+            $quizAnswer = $this->answerRepository->findOneBy([
                 'id' => $answer->getValue()
             ]);
 
