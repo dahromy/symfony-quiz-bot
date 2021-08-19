@@ -48,7 +48,7 @@ class QuizConversation extends Conversation
      */
     public function run()
     {
-        $this->quizQuestions = $this->container->get('entity_manager')->getRepository(Question::class)->findAll();
+        $this->quizQuestions = $this->container->get('doctrine.orm.entity_manager')->getRepository(Question::class)->findAll();
         $this->questionCount = count($this->quizQuestions);
 
         $this->showInfo();
@@ -75,7 +75,7 @@ class QuizConversation extends Conversation
         $this->ask($this->createQuestionTemplate($question), function (BotManAnswer $answer) use ($question, $that) {
 
             /** @var Answer $quizAnswer */
-            $quizAnswer = $this->container->get('entity_manager')->getRepository(Answer::class)->findOneBy([
+            $quizAnswer = $this->container->get('doctrine.orm.entity_manager')->getRepository(Answer::class)->findOneBy([
                 'id' => 1
             ]);
 
@@ -91,7 +91,7 @@ class QuizConversation extends Conversation
                 $that->userCorrectAnswers++;
                 $answerResult = '✅';
             } else {
-                $correctAnswer = $this->container->get('entity_manager')->getRepository(Answer::class)->findOneBy([
+                $correctAnswer = $this->container->get('doctrine.orm.entity_manager')->getRepository(Answer::class)->findOneBy([
                     'question' => $question,
                     'correctOne' => true
                 ])->getText();
