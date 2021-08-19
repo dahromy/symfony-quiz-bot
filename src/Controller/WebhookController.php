@@ -23,14 +23,34 @@ use Symfony\Component\HttpFoundation\Response;
 
 class WebhookController
 {
-    public function __invoke(BotMan $botman, QuestionRepository $questionRepository, AnswerRepository $answerRepository): Response
+    /**
+     * @var QuestionRepository
+     */
+    private $questionRepository;
+    /**
+     * @var AnswerRepository
+     */
+    private $answerRepository;
+
+    /**
+     * WebhookController constructor.
+     * @param QuestionRepository $questionRepository
+     * @param AnswerRepository $answerRepository
+     */
+    public function __construct(QuestionRepository $questionRepository, AnswerRepository $answerRepository)
+    {
+        $this->questionRepository = $questionRepository;
+        $this->answerRepository = $answerRepository;
+    }
+
+    public function __invoke(BotMan $botman): Response
     {
         $botman->hears('Hi', function (BotMan $bot) {
             $bot->reply('Hello!');
         });
 
-        $botman->hears('start', function (BotMan $bot) use ($answerRepository, $questionRepository) {
-            $bot->startConversation(new QuizConversation($questionRepository, $answerRepository));
+        $botman->hears('start', function (BotMan $bot) {
+            $bot->startConversation(new QuizConversation($this->questionRepository, $this->answerRepository));
         });
 
         $botman->listen();
