@@ -75,7 +75,7 @@ class QuizConversation extends Conversation
         $this->ask($this->createQuestionTemplate($question), function (BotManAnswer $answer) use ($question, $that) {
 
             /** @var Answer $quizAnswer */
-            $quizAnswer = $this->container->get('doctrine.orm.entity_manager')->getRepository(Answer::class)->findOneBy([
+            $quizAnswer = $that->container->get('doctrine.orm.entity_manager')->getRepository(Answer::class)->findOneBy([
                 'id' => 1
             ]);
 
@@ -91,7 +91,7 @@ class QuizConversation extends Conversation
                 $that->userCorrectAnswers++;
                 $answerResult = '✅';
             } else {
-                $correctAnswer = $this->container->get('doctrine.orm.entity_manager')->getRepository(Answer::class)->findOneBy([
+                $correctAnswer = $that->container->get('doctrine.orm.entity_manager')->getRepository(Answer::class)->findOneBy([
                     'question' => $question,
                     'correctOne' => true
                 ])->getText();
