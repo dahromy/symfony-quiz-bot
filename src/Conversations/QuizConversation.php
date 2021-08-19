@@ -80,8 +80,8 @@ class QuizConversation extends Conversation
 
             /** @var Answer $quizAnswer */
             $quizAnswer = $that->answerRepository->findOneBy([
-                'id' => $answer->getValue()
-            ]) ? :null;
+                'id' => 1
+            ]);
 
             if (!$quizAnswer) {
                 $that->say('Sorry, I did not get that. Please use the buttons.');
