@@ -77,35 +77,34 @@ class QuizConversation extends Conversation
     {
         $this->ask($this->createQuestionTemplate($question), function (BotManAnswer $answer) use ($question) {
 
-//            /** @var Answer $quizAnswer */
-//            $quizAnswer = $this->answerRepository->findOneBy([
-//                'id' => $answer->getValue()
-//            ]);
-//
-//            if (!$quizAnswer) {
-//                $this->say('Sorry, I did not get that. Please use the buttons.');
-//                return $this->checkForNextQuestion();
-//            }
-//
-//
-//            if ($quizAnswer->getCorrectOne()) {
-//                $this->userPoints += $question->getPoints();
-//                $this->userCorrectAnswers++;
-//                $answerResult = '✅';
-//            } else {
-//                $correctAnswer = $this->answerRepository->findOneBy([
-//                    'question' => $question,
-//                    'correctOne' => true
-//                ])->getText();
-//
-//                $answerResult = "❌ (Correct: {$correctAnswer})";
-//            }
-//
-//            $this->currentQuestion++;
+            /** @var Answer $quizAnswer */
+            $quizAnswer = $this->answerRepository->findOneBy([
+                'id' => $answer->getValue()
+            ]);
 
-//            $this->say("Your answer: {$quizAnswer->getText()} {$answerResult}");
-            $this->say("Your answer: {$answer->getValue()}");
+            if (!$quizAnswer) {
+                $this->say('Sorry, I did not get that. Please use the buttons.');
+                return $this->checkForNextQuestion();
+            }
+
             $this->quizQuestions = $this->setQuizData($question);
+
+            if ($quizAnswer->getCorrectOne()) {
+                $this->userPoints += $question->getPoints();
+                $this->userCorrectAnswers++;
+                $answerResult = '✅';
+            } else {
+                $correctAnswer = $this->answerRepository->findOneBy([
+                    'question' => $question,
+                    'correctOne' => true
+                ])->getText();
+
+                $answerResult = "❌ (Correct: {$correctAnswer})";
+            }
+
+            $this->currentQuestion++;
+
+            $this->say("Your answer: {$quizAnswer->getText()} {$answerResult}");
             $this->checkForNextQuestion();
         });
     }
