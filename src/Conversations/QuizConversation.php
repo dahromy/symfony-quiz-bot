@@ -13,6 +13,7 @@ use BotMan\BotMan\Messages\Incoming\Answer as BotManAnswer;
 use BotMan\BotMan\Messages\Outgoing\Actions\Button;
 use BotMan\BotMan\Messages\Outgoing\Question as BotManQuestion;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class QuizConversation extends Conversation
 {
@@ -30,21 +31,16 @@ class QuizConversation extends Conversation
     /** @var integer */
     protected $currentQuestion = 1;
 
-    /** @var QuestionRepository */
-    private $questionRepository;
-
-    /** @var AnswerRepository */
-    private $answerRepository;
+    /** @var ContainerInterface */
+    private $container;
 
     /**
      * QuizConversation constructor.
-     * @param $questionRepository
-     * @param $answerRepository
+     * @param $container
      */
-    public function __construct($questionRepository, $answerRepository)
+    public function __construct($container)
     {
-        $this->questionRepository = $questionRepository;
-        $this->answerRepository = $answerRepository;
+        $this->container = $container;
     }
 
     /**
@@ -52,7 +48,7 @@ class QuizConversation extends Conversation
      */
     public function run()
     {
-        $this->quizQuestions = $this->questionRepository->findAll();
+        $this->quizQuestions = $this->container->get('entity_manager')->getRepository(Question::class)->findAll();
         $this->questionCount = count($this->quizQuestions);
 
         $this->showInfo();
@@ -79,7 +75,7 @@ class QuizConversation extends Conversation
         $this->ask($this->createQuestionTemplate($question), function (BotManAnswer $answer) use ($question, $that) {
 
             /** @var Answer $quizAnswer */
-            $quizAnswer = $that->answerRepository->findOneBy([
+            $quizAnswer = $this->container->get('entity_manager')->getRepository(Answer::class)->findOneBy([
                 'id' => 1
             ]);
 
@@ -95,7 +91,7 @@ class QuizConversation extends Conversation
                 $that->userCorrectAnswers++;
                 $answerResult = '✅';
             } else {
-                $correctAnswer = $that->answerRepository->findOneBy([
+                $correctAnswer = $this->container->get('entity_manager')->getRepository(Answer::class)->findOneBy([
                     'question' => $question,
                     'correctOne' => true
                 ])->getText();
