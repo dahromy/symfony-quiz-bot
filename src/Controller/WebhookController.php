@@ -29,7 +29,7 @@ class WebhookController
             $bot->reply('Hello!');
         });
 
-        $botman->hears('start', function (BotMan $bot) {
+        $botman->hears('start', function (BotMan $bot) use ($answerRepository, $questionRepository) {
             $bot->startConversation(new QuizConversation($questionRepository, $answerRepository));
         });
 
