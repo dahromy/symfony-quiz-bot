@@ -7,6 +7,7 @@ namespace App\Conversations;
 use App\Entity\Answer;
 use App\Entity\Question;
 use App\Repository\AnswerRepository;
+use App\Repository\QuestionRepository;
 use BotMan\BotMan\Messages\Conversations\Conversation;
 use BotMan\BotMan\Messages\Incoming\Answer as BotManAnswer;
 use BotMan\BotMan\Messages\Outgoing\Actions\Button;
@@ -29,23 +30,20 @@ class QuizConversation extends Conversation
     /** @var integer */
     protected $currentQuestion = 1;
 
-    /**
-     * @var EntityManagerInterface
-     */
-    private $manager;
-    /**
-     * @var AnswerRepository
-     */
+    /** @var QuestionRepository */
+    private $questionRepository;
+
+    /** @var AnswerRepository */
     private $answerRepository;
 
     /**
      * QuizConversation constructor.
-     * @param EntityManagerInterface $manager
-     * @param AnswerRepository $answerRepository
+     * @param $questionRepository
+     * @param $answerRepository
      */
-    public function __construct(EntityManagerInterface $manager, AnswerRepository $answerRepository)
+    public function __construct($questionRepository, $answerRepository)
     {
-        $this->manager = $manager;
+        $this->questionRepository = $questionRepository;
         $this->answerRepository = $answerRepository;
     }
 
@@ -54,7 +52,7 @@ class QuizConversation extends Conversation
      */
     public function run()
     {
-        $this->quizQuestions = $this->manager->getRepository(Question::class)->findAll();
+        $this->quizQuestions = $this->questionRepository->findAll();
         $this->questionCount = count($this->quizQuestions);
 
         $this->showInfo();
@@ -80,7 +78,7 @@ class QuizConversation extends Conversation
         $this->ask($this->createQuestionTemplate($question), function (BotManAnswer $answer) use ($question) {
 
             /** @var Answer $quizAnswer */
-            $quizAnswer =$correctAnswer = $this->manager->getRepository(Answer::class)->findOneBy([
+            $quizAnswer =$correctAnswer = $this->answerRepository->findOneBy([
                 'id' => $answer->getValue()
             ]);
 
@@ -96,7 +94,7 @@ class QuizConversation extends Conversation
                 $this->userCorrectAnswers++;
                 $answerResult = '✅';
             } else {
-                $correctAnswer = $this->manager->getRepository(Answer::class)->findOneBy([
+                $correctAnswer = $this->answerRepository->findOneBy([
                     'question' => $question,
                     'correctOne' => true
                 ])->getText();

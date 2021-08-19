@@ -14,41 +14,23 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Conversations\QuizConversation;
+use App\Entity\Question;
 use App\Repository\AnswerRepository;
+use App\Repository\QuestionRepository;
 use BotMan\BotMan\BotMan;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 class WebhookController
 {
-    /**
-     * @var EntityManagerInterface
-     */
-    private $manager;
-    /**
-     * @var AnswerRepository
-     */
-    private $answerRepository;
-
-    /**
-     * WebhookController constructor.
-     * @param EntityManagerInterface $manager
-     * @param AnswerRepository $answerRepository
-     */
-    public function __construct(EntityManagerInterface $manager, AnswerRepository $answerRepository)
-    {
-        $this->manager = $manager;
-        $this->answerRepository = $answerRepository;
-    }
-
-    public function __invoke(BotMan $botman): Response
+    public function __invoke(BotMan $botman, QuestionRepository $questionRepository, AnswerRepository $answerRepository): Response
     {
         $botman->hears('Hi', function (BotMan $bot) {
             $bot->reply('Hello!');
         });
 
         $botman->hears('start', function (BotMan $bot) {
-            $bot->startConversation(new QuizConversation($this->manager, $this->answerRepository));
+            $bot->startConversation(new QuizConversation($questionRepository, $answerRepository));
         });
 
         $botman->listen();
