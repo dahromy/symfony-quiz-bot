@@ -75,26 +75,27 @@ class QuizConversation extends Conversation
 
     public function askQuestion(Question $question)
     {
-        $this->ask($this->createQuestionTemplate($question), function (BotManAnswer $answer) use ($question) {
+        $that = $this;
+        $this->ask($this->createQuestionTemplate($question), function (BotManAnswer $answer) use ($question, $that) {
 
             /** @var Answer $quizAnswer */
-            $quizAnswer = $this->answerRepository->findOneBy([
+            $quizAnswer = $that->answerRepository->findOneBy([
                 'id' => $answer->getValue()
             ]);
 
             if (!$quizAnswer) {
-                $this->say('Sorry, I did not get that. Please use the buttons.');
-                return $this->checkForNextQuestion();
+                $that->say('Sorry, I did not get that. Please use the buttons.');
+                return $that->checkForNextQuestion();
             }
 
-            $this->quizQuestions = $this->setQuizData($question);
+            $that->quizQuestions = $that->setQuizData($question);
 
             if ($quizAnswer->getCorrectOne()) {
-                $this->userPoints += $question->getPoints();
-                $this->userCorrectAnswers++;
+                $that->userPoints += $question->getPoints();
+                $that->userCorrectAnswers++;
                 $answerResult = '✅';
             } else {
-                $correctAnswer = $this->answerRepository->findOneBy([
+                $correctAnswer = $that->answerRepository->findOneBy([
                     'question' => $question,
                     'correctOne' => true
                 ])->getText();
@@ -102,10 +103,10 @@ class QuizConversation extends Conversation
                 $answerResult = "❌ (Correct: {$correctAnswer})";
             }
 
-            $this->currentQuestion++;
+            $that->currentQuestion++;
 
             $this->say("Your answer: {$quizAnswer->getText()} {$answerResult}");
-            $this->checkForNextQuestion();
+            $that->checkForNextQuestion();
         });
     }
 
