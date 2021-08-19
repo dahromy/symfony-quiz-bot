@@ -69,18 +69,18 @@ class QuizConversation extends Conversation
     public function checkForNextQuestion()
     {
         if (count($this->quizQuestions) > 0) {
-            return $this->askQuestion(current($this->quizQuestions), $this->manager);
+            return $this->askQuestion(current($this->quizQuestions));
         }
 
         $this->showResult();
     }
 
-    public function askQuestion(Question $question, $manager)
+    public function askQuestion(Question $question)
     {
-        $this->ask($this->createQuestionTemplate($question), function (BotManAnswer $answer) use ($manager, $question) {
+        $this->ask($this->createQuestionTemplate($question), function (BotManAnswer $answer) use ($question) {
 
             /** @var Answer $quizAnswer */
-            $quizAnswer =$correctAnswer = $manager->getRepository(Answer::class)->findOneBy([
+            $quizAnswer =$correctAnswer = $this->manager->getRepository(Answer::class)->findOneBy([
                 'id' => $answer->getValue()
             ]);
 
@@ -96,7 +96,7 @@ class QuizConversation extends Conversation
                 $this->userCorrectAnswers++;
                 $answerResult = '✅';
             } else {
-                $correctAnswer = $manager->getRepository(Answer::class)->findOneBy([
+                $correctAnswer = $this->manager->getRepository(Answer::class)->findOneBy([
                     'question' => $question,
                     'correctOne' => true
                 ])->getText();
