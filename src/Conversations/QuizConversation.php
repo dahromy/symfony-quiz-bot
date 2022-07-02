@@ -12,11 +12,13 @@ use BotMan\BotMan\Messages\Conversations\Conversation;
 use BotMan\BotMan\Messages\Incoming\Answer as BotManAnswer;
 use BotMan\BotMan\Messages\Outgoing\Actions\Button;
 use BotMan\BotMan\Messages\Outgoing\Question as BotManQuestion;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class QuizConversation extends Conversation
 {
+    /** @var ArrayCollection<Question> */
     protected $quizQuestions;
 
     /** @var integer */
@@ -62,57 +64,43 @@ class QuizConversation extends Conversation
 
     public function checkForNextQuestion()
     {
-        if (count($this->quizQuestions) > 0) {
-            return $this->askQuestion(current($this->quizQuestions));
+        if ($this->quizQuestions->count() > 0) {
+            $this->askQuestion($this->quizQuestions->first());
         }
 
         $this->showResult();
     }
 
-    public function askQuestion(Question $question)
+    private function askQuestion(Question $question)
     {
-        $that = $this;
-        $this->ask($this->createQuestionTemplate($question), function (BotManAnswer $answer) use ($question, $that) {
-
+        $this->ask($this->createQuestionTemplate($question), function (BotManAnswer $answer) use ($question) {
             /** @var Answer $quizAnswer */
-            $quizAnswer = $that->container->get('doctrine.orm.entity_manager')->getRepository(Answer::class)->findOneBy([
-                'id' => 1
-            ]);
+            $quizAnswer = $this->container->get('doctrine.orm.entity_manager')->getRepository(Answer::class)->findOneById($answer->getValue());
 
             if (!$quizAnswer) {
-                $that->say('Sorry, I did not get that. Please use the buttons.');
-                return $that->checkForNextQuestion();
+                $this->say('Sorry, I did not get that. Please use the buttons.');
+                $this->checkForNextQuestion();
             }
 
-            $that->quizQuestions = $that->setQuizData($question);
+            $this->quizQuestions->remove($question);
 
             if ($quizAnswer->getCorrectOne()) {
-                $that->userPoints += $question->getPoints();
-                $that->userCorrectAnswers++;
+                $this->userPoints += $question->getPoints();
+                $this->userCorrectAnswers++;
                 $answerResult = '✅';
             } else {
-                $correctAnswer = $that->container->get('doctrine.orm.entity_manager')->getRepository(Answer::class)->findOneBy([
-                    'question' => $question,
-                    'correctOne' => true
-                ])->getText();
-
-                $answerResult = "❌ (Correct: {$correctAnswer})";
+                /** @var Answer $correctAnswer */
+                $correctAnswer = $this->container->get('doctrine.orm.entity_manager')->getRepository(Answer::class)->findOneBy(['correct_one' => true]);
+                $answerResult = "❌ (Correct: {$correctAnswer->getText()})";
             }
-
-            $that->currentQuestion++;
+            $this->currentQuestion++;
 
             $this->say("Your answer: {$quizAnswer->getText()} {$answerResult}");
-            $that->checkForNextQuestion();
+            $this->checkForNextQuestion();
         });
     }
 
-    public function showResult()
-    {
-        $this->say('Finished 🏁');
-        $this->say("You made it through all the questions. You reached {$this->userPoints} points! Correct answers: {$this->userCorrectAnswers} / {$this->questionCount}");
-    }
-
-    public function createQuestionTemplate(Question $question)
+    private function createQuestionTemplate(Question $question): BotManQuestion
     {
         $questionText = '➡️ Question: '.$this->currentQuestion.' / '.$this->questionCount.' : '.$question->getText();
         $questionTemplate = BotManQuestion::create($questionText);
@@ -124,6 +112,68 @@ class QuizConversation extends Conversation
 
         return $questionTemplate;
     }
+
+    private function showResult()
+    {
+        $this->say('Finished ?');
+        $this->say("You made it through all the questions. You reached {$this->userPoints} points! Correct answers: {$this->userCorrectAnswers} / {$this->questionCount}");
+    }
+
+//    public function askQuestion(Question $question)
+//    {
+//        $that = $this;
+//        $this->ask($this->createQuestionTemplate($question), function (BotManAnswer $answer) use ($question, $that) {
+//
+//            /** @var Answer $quizAnswer */
+//            $quizAnswer = $that->container->get('doctrine.orm.entity_manager')->getRepository(Answer::class)->findOneBy([
+//                'id' => 1
+//            ]);
+//
+//            if (!$quizAnswer) {
+//                $that->say('Sorry, I did not get that. Please use the buttons.');
+//                $that->checkForNextQuestion();
+//            }
+//
+//            $that->quizQuestions = $that->setQuizData($question);
+//
+//            if ($quizAnswer->getCorrectOne()) {
+//                $that->userPoints += $question->getPoints();
+//                $that->userCorrectAnswers++;
+//                $answerResult = '✅';
+//            } else {
+//                $correctAnswer = $that->container->get('doctrine.orm.entity_manager')->getRepository(Answer::class)->findOneBy([
+//                    'question' => $question,
+//                    'correctOne' => true
+//                ])->getText();
+//
+//                $answerResult = "❌ (Correct: {$correctAnswer})";
+//            }
+//
+//            $that->currentQuestion++;
+//
+//            $this->say("Your answer: {$quizAnswer->getText()} {$answerResult}");
+//            $that->checkForNextQuestion();
+//        });
+//    }
+//
+//    public function showResult()
+//    {
+//        $this->say('Finished 🏁');
+//        $this->say("You made it through all the questions. You reached {$this->userPoints} points! Correct answers: {$this->userCorrectAnswers} / {$this->questionCount}");
+//    }
+//
+//    public function createQuestionTemplate(Question $question)
+//    {
+//        $questionText = '➡️ Question: '.$this->currentQuestion.' / '.$this->questionCount.' : '.$question->getText();
+//        $questionTemplate = BotManQuestion::create($questionText);
+//        $answers = $question->getAnswers();
+//
+//        foreach ($answers as $answer) {
+//            $questionTemplate->addButton(Button::create($answer->getText())->value($answer->getId()));
+//        }
+//
+//        return $questionTemplate;
+//    }
 
     public function setQuizData(Question $question)
     {
