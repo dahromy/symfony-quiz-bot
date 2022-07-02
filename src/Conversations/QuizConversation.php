@@ -65,7 +65,7 @@ class QuizConversation extends Conversation
     public function checkForNextQuestion()
     {
         if ($this->quizQuestions->count() > 0) {
-            $this->askQuestion($this->quizQuestions->first());
+            return $this->askQuestion($this->quizQuestions->first());
         }
 
         $this->showResult();
@@ -79,7 +79,7 @@ class QuizConversation extends Conversation
 
             if (!$quizAnswer) {
                 $this->say('Sorry, I did not get that. Please use the buttons.');
-                $this->checkForNextQuestion();
+                return $this->checkForNextQuestion();
             }
 
             $this->quizQuestions->remove($question);
