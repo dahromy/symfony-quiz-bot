@@ -1,16 +1,7 @@
 botman:
     drivers:
-
-# Uncomment this to enable Telegram bot driver
-# Remember configure options in .env file
-#        telegram:
-#            parameters:
-#                token: '%env(TELEGRAM_BOT_API)%'
-
-
-
-# Uncomment this to enable Facebook Messenger driver
-# Remember configure options in .env file
+        # Uncomment this to enable Facebook Messenger driver
+        # Remember configure options in .env file
         facebook:
             parameters:
                 token: '%env(FACEBOOK_TOKEN)%'
