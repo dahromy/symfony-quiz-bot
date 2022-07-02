@@ -159,7 +159,7 @@ class QuizConversation extends Conversation
         $this->say("You made it through all the questions. You reached {$this->userPoints} points! Correct answers: {$this->userCorrectAnswers} / {$this->questionCount}");
     }
 
-    public function createQuestionTemplate(Question $question)
+    public function createQuestionTemplate(Question $question): BotManQuestion
     {
         $questionText = '➡️ Question: '.$this->currentQuestion.' / '.$this->questionCount.' : '.$question->getText();
         $questionTemplate = BotManQuestion::create($questionText);
