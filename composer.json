@@ -7,6 +7,7 @@
         "ext-iconv": "*",
         "botman/driver-facebook": "^1.9",
         "botman/driver-telegram": "^1.5",
+        "botman/driver-web": "^1.5",
         "composer/package-versions-deprecated": "1.11.99.2",
         "doctrine/doctrine-bundle": "^2.4",
         "doctrine/doctrine-fixtures-bundle": "^3.4",

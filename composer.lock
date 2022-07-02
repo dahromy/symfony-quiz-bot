@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5d9f8aed1e7e8df7bc230a1eac78d0e4",
+    "content-hash": "09d3cb0c787cb5888302db0e4beebbc0",
     "packages": [
         {
             "name": "botman/botman",
@@ -212,6 +212,71 @@
                 "source": "https://github.com/botman/driver-telegram/tree/1.6.2"
             },
             "time": "2020-09-24T03:40:55+00:00"
+        },
+        {
+            "name": "botman/driver-web",
+            "version": "v1.5.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/botman/driver-web.git",
+                "reference": "45b3bde9c5af0f52d9a893a3793740e3304015af"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/botman/driver-web/zipball/45b3bde9c5af0f52d9a893a3793740e3304015af",
+                "reference": "45b3bde9c5af0f52d9a893a3793740e3304015af",
+                "shasum": ""
+            },
+            "require": {
+                "botman/botman": ">=2.0",
+                "php": ">=7.0"
+            },
+            "require-dev": {
+                "botman/driver-facebook": "~2.0",
+                "botman/studio-addons": "~1.0",
+                "ext-curl": "*",
+                "illuminate/support": "~5.5.0",
+                "mockery/mockery": "^1.1",
+                "phpunit/phpunit": "~5.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.0-dev"
+                },
+                "laravel": {
+                    "providers": [
+                        "BotMan\\Drivers\\Web\\Providers\\WebServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "BotMan\\Drivers\\Web\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Marcel Pociot",
+                    "email": "m.pociot@gmail.com"
+                }
+            ],
+            "description": "Web driver for BotMan",
+            "homepage": "http://github.com/botman/driver-web",
+            "keywords": [
+                "Botman",
+                "bot",
+                "web"
+            ],
+            "support": {
+                "issues": "https://github.com/botman/driver-web/issues",
+                "source": "https://github.com/botman/driver-web/tree/v1.5.3"
+            },
+            "time": "2022-05-01T20:39:28+00:00"
         },
         {
             "name": "clue/stream-filter",
